@@ -1,2 +1,20 @@
-let a =10;
-console.log(a);
+import app from './app'
+import mongoose from 'mongoose'
+import config from './app/config'
+
+// // const port = 5000
+// require('dotenv').config()
+console.log(process.env.PORT)
+async function server() {
+  try {
+    await mongoose.connect(config.database_url!)
+    console.log('conected mongodb')
+    app.listen(config.port, () => {
+      console.log(`Example app listening on port ${process.env.PORT}`)
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+server().catch((err) => console.log(err))
