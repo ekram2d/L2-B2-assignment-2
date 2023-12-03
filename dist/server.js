@@ -13,15 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("./app/config"));
-// // const port = 5000
-// require('dotenv').config()
-console.log(process.env.PORT);
 function server() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            //   await mongoose.connect(process.env.DATABASE_URL!)
-            //   console.log('conected mongodb')
+            yield mongoose_1.default.connect(config_1.default.database_url);
+            console.log('conected mongodb');
             app_1.default.listen(config_1.default.port, () => {
                 console.log(`Example app listening on port ${process.env.PORT}`);
             });

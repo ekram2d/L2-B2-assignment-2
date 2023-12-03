@@ -2,30 +2,27 @@ import { Schema, model } from 'mongoose'
 import { User } from '../interfaces/user.interface'
 
 const userSchema = new Schema<User>({
-  userId: { type: Number, required: [true, 'User ID is required'] },
-  username: { type: String, required: [true, 'Username is required'] },
-  password: { type: String, required: [true, 'Password is required'] },
+  userId: { type: Number, required: true },
+  username: { type: String, required: true },
+  password: { type: String, required: true },
   fullName: {
-    firstName: { type: String, required: [true, 'First name is required'] },
-    lastName: { type: String, required: [true, 'Last name is required'] },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
   },
-  age: { type: Number, required: [true, 'Age is required'] },
-  email: { type: String, required: [true, 'Email is required'] },
-  isActive: { type: Boolean, required: [true, 'Active status is required'] },
+  age: { type: Number, required: true },
+  email: { type: String, required: true },
+  isActive: { type: Boolean, required: true },
   hobbies: [{ type: String }],
   address: {
-    street: { type: String, required: [true, 'Street is required'] },
-    city: { type: String, required: [true, 'City is required'] },
-    country: { type: String, required: [true, 'Country is required'] },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    country: { type: String, required: true },
   },
   orders: [
     {
-      productName: {
-        type: String,
-        required: [true, 'Product name is required'],
-      },
-      price: { type: Number, required: [true, 'Price is required'] },
-      quantity: { type: Number, required: [true, 'Quantity is required'] },
+      productName: { type: String, required: true },
+      price: { type: Number, required: true },
+      quantity: { type: Number, required: true },
     },
   ],
 })
