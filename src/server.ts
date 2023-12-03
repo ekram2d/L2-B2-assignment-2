@@ -2,9 +2,6 @@ import app from './app'
 import mongoose from 'mongoose'
 import config from './app/config'
 
-// // const port = 5000
-// require('dotenv').config()
-console.log(process.env.PORT)
 async function server() {
   try {
     await mongoose.connect(config.database_url!)
