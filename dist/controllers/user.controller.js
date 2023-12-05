@@ -8,18 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
-const user_model_1 = __importDefault(require("../models/user.model"));
+const user_service_1 = require("../services/user.service");
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
-        // Create a new user instance without saving it yet
-        console.log(userData);
-        const result = yield user_model_1.default.create(userData);
+        // console.log('o', userData)
+        const result = yield user_service_1.userService.creatUser(userData);
         console.log(result);
         res.status(201).json({
             success: true,
@@ -37,7 +33,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield user_model_1.default.find();
+        const users = yield user_service_1.userService.getUser();
         //     console.log('ekram')
         const formattedUsers = users.map((user) => ({
             username: user.username,
@@ -67,7 +63,93 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
+const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const user = yield user_service_1.userService.singleUser(userId);
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: 'User fetched successfully!',
+            data: user,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch user',
+            error: error, // Change 'error' to 'error.message' to capture the error message
+        });
+    }
+});
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const userDataToUpdate = req.body;
+        // Check if the user exists and update the data
+        // console.log({ userId }, { userDataToUpdate })
+        const updatedUser = yield user_service_1.userService.updateUser(userId, userDataToUpdate);
+        if (!updatedUser) {
+            res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+            return;
+        }
+        // console.log({ updateUser })
+        res.status(200).json({
+            success: true,
+            message: 'User updated successfully!!!!!!!!',
+            data: updateUser,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update user',
+            error: error,
+        });
+    }
+});
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        // Find the user by ID and delete
+        // console.log({ userId })
+        const deletedUser = yield user_service_1.userService.deleteUser(userId);
+        // Check if the user was found and deleted
+        if (!deletedUser) {
+            res.status(404).json({
+                success: false,
+                message: 'User not found',
+                data: null,
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: 'User deleted successfully!',
+            data: null,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete user',
+            error: error,
+        });
+    }
+});
 exports.userController = {
     getUsers,
     createUser,
+    getSingleUser,
+    updateUser,
+    deleteUser,
 };

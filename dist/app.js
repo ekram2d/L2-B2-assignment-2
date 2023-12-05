@@ -9,12 +9,5 @@ const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use('/', user_route_1.userRoutes); // Use the userRoutes directly
-// Example route to test the server
-// app.get('/', (req, res) => {
-//   res.status(200).json({
-//     status: 'success',
-//     message: 'Welcome to muster card',
-//   })
-// })
+app.use('/', user_route_1.userRoutes);
 exports.default = app;

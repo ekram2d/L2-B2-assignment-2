@@ -4,9 +4,7 @@ import { userService } from '../services/user.service'
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body
-
-    // Create a new user instance without saving it yet
-    console.log(userData)
+    // console.log('o', userData)
     const result = await userService.creatUser(userData)
     console.log(result)
     res.status(201).json({
@@ -83,64 +81,61 @@ const getSingleUser = async (req: Request, res: Response): Promise<void> => {
 }
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const users = await userService.getUser()
-    //     console.log('ekram')
-    const formattedUsers = users.map((user) => ({
-      username: user.username,
-      fullName: {
-        firstName: user.fullName.firstName,
-        lastName: user.fullName.lastName,
-      },
-      age: user.age,
-      email: user.email,
-      address: {
-        street: user.address.street,
-        city: user.address.city,
-        country: user.address.country,
-      },
-    }))
+    const userId: string = req.params.userId
+    const userDataToUpdate = req.body
 
+    // Check if the user exists and update the data
+    // console.log({ userId }, { userDataToUpdate })
+    const updatedUser = await userService.updateUser(userId, userDataToUpdate)
+    if (!updatedUser) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      })
+      return
+    }
+    // console.log({ updateUser })
     res.status(200).json({
       success: true,
-      message: 'Users fetched successfully!',
-      data: formattedUsers,
+      message: 'User updated successfully!!!!!!!!',
+      data: updateUser,
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch users',
+      message: 'Failed to update user',
       error: error,
     })
   }
 }
-const deleteUser = async (req: Request, res: Response) => {
+
+const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await userService.getUser()
-    //     console.log('ekram')
-    const formattedUsers = users.map((user) => ({
-      username: user.username,
-      fullName: {
-        firstName: user.fullName.firstName,
-        lastName: user.fullName.lastName,
-      },
-      age: user.age,
-      email: user.email,
-      address: {
-        street: user.address.street,
-        city: user.address.city,
-        country: user.address.country,
-      },
-    }))
+    const userId = req.params.userId
+
+    // Find the user by ID and delete
+    // console.log({ userId })
+    const deletedUser = await userService.deleteUser(userId)
+
+    // Check if the user was found and deleted
+    if (!deletedUser) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: null,
+      })
+      return
+    }
 
     res.status(200).json({
       success: true,
-      message: 'Users fetched successfully!',
-      data: formattedUsers,
+      message: 'User deleted successfully!',
+      data: null,
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch users',
+      message: 'Failed to delete user',
       error: error,
     })
   }

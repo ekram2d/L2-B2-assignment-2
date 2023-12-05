@@ -1,6 +1,14 @@
 import { Schema, model } from 'mongoose'
-import { User } from '../interfaces/user.interface'
+import { User, Order } from '../interfaces/user.interface'
 
+// Define the order schema
+const orderSchema = new Schema<Order>({
+  productName: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+})
+
+// Define the user schema using the order schema
 const userSchema = new Schema<User>({
   userId: { type: Number, required: true },
   username: { type: String, required: true },
@@ -18,13 +26,7 @@ const userSchema = new Schema<User>({
     city: { type: String, required: true },
     country: { type: String, required: true },
   },
-  orders: [
-    {
-      productName: { type: String, required: true },
-      price: { type: Number, required: true },
-      quantity: { type: Number, required: true },
-    },
-  ],
+  orders: [orderSchema], // Use the order schema here for the orders array
 })
 
 const UserModel = model<User>('User', userSchema)
