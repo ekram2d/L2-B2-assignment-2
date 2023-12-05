@@ -47,7 +47,7 @@ const updateUser = async (
     return updatedUser
   } catch (error) {
     // Handle specific errors or log them for debugging
-    console.error('Error updating user:', error)
+    // console.error('Error updating user:', error)
 
     // Return appropriate error message
     return {

@@ -1,4 +1,4 @@
-import { Order } from '../interfaces/user.interface'
+import { Order, User } from '../interfaces/user.interface'
 import UserModel from '../models/user.model' // Assuming UserDocument is the user model document type
 
 const addOrder = async (
@@ -6,7 +6,7 @@ const addOrder = async (
   orderData: Order,
 ): Promise<Order | null> => {
   const updatedUser = await UserModel.findOne({ userId: userId })
-  console.log(updatedUser)
+  // console.log(updatedUser)
 
   if (!updatedUser) {
     throw new Error('User not found')
@@ -23,7 +23,7 @@ const addOrder = async (
 }
 const getOrder = async (userId: string): Promise<Order | null> => {
   const gettedUser = await UserModel.findOne({ userId: userId })
-  console.log(gettedUser?.orders)
+  // console.log(gettedUser?.orders)
 
   if (!gettedUser) {
     throw new Error('User not found')
@@ -31,8 +31,19 @@ const getOrder = async (userId: string): Promise<Order | null> => {
 
   return gettedUser?.orders
 }
+const getOrderTotal = async (userId: string): Promise<User | null> => {
+  const gettedUser = await UserModel.findOne({ userId: userId })
+  // console.log(gettedUser?.orders)
+
+  if (!gettedUser) {
+    throw new Error('User not found')
+  }
+
+  return gettedUser
+}
 
 export const orderService = {
   addOrder,
   getOrder,
+  getOrderTotal,
 }

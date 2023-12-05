@@ -71,7 +71,51 @@ const getSinleUserOrders = async (
     })
   }
 }
+const getSinleUserOrdersSum = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = req.params.userId
+
+    // Check if the user exists
+    const Orders = await orderService.getOrderTotal(userId)
+    if (!Orders) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      })
+      return
+    }
+
+    // User found, retrieve orders
+    const userOrders = Orders?.orders
+    // const userOrders = user.orders;
+    const totalPrice = userOrders.reduce(
+      (acc: number, order: Order) => acc + order.price * order.quantity,
+      0,
+    )
+
+    res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: {
+        totalPrice: totalPrice.toFixed(2), // Convert to fixed decimal places if needed
+      },
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to calculate total price',
+      error: {
+        code: 500,
+        description: error,
+      },
+    })
+  }
+}
 export const orderController = {
   addToOrder,
   getSinleUserOrders,
+  getSinleUserOrdersSum,
 }

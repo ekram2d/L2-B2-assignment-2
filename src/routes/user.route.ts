@@ -11,4 +11,8 @@ router.patch('/users/:userId', userController.updateUser)
 router.delete('/users/:userId', userController.deleteUser)
 router.post('/users/:userId/orders', orderController.addToOrder)
 router.get('/users/:userId/orders', orderController.getSinleUserOrders)
+router.get(
+  '/users/:userId/orders/total-price',
+  orderController.getSinleUserOrdersSum,
+)
 export const userRoutes = router
