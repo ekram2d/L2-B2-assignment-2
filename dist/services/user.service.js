@@ -64,10 +64,13 @@ const updateUser = (userId, updatedValue) => __awaiter(void 0, void 0, void 0, f
     }
 });
 const deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // const validUserId = new mongoose.Types.ObjectId(userId) // Use mongoose.Types.ObjectId
-    // console.log({ validUserId })
-    yield user_model_1.default.findOneAndDelete({ userId });
-    return null; // Return the deleted user or null if not found
+    try {
+        const deletedUser = yield user_model_1.default.findOneAndDelete({ userId }).lean();
+        return deletedUser;
+    }
+    catch (error) {
+        throw new Error('Failed to delete user'); // Handle any errors while deleting the user
+    }
 });
 exports.userService = {
     creatUser,
