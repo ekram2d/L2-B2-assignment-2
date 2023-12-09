@@ -1,25 +1,54 @@
 import { Request, Response } from 'express'
 
 import { userService } from '../services/user.service'
+// import { ObjectSchema } from 'joi'
+import createUserValidation from '../validation/user.validation'
+
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body
-    // console.log('o', userData)
-    const result = await userService.creatUser(userData)
-    console.log(result)
-    res.status(201).json({
+    const { error, value } = createUserValidation.validate(userData)
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        error: error.details,
+      })
+    }
+
+    const result = await userService.creatUser(value)
+
+    // Define the specific response structure when the user is created successfully
+    const responseData = {
       success: true,
       message: 'User created successfully!',
-      data: result,
-    })
-  } catch (error) {
-    res.status(500).json({
+      data: {
+        userId: result.userId,
+        username: result.username,
+        fullName: {
+          firstName: result.fullName.firstName,
+          lastName: result.fullName.lastName,
+        },
+        age: result.age,
+        email: result.email,
+        isActive: result.isActive,
+        hobbies: result.hobbies,
+        address: result.address,
+      },
+    }
+
+    return res.status(201).json(responseData)
+  } catch (error: any) {
+    // In case of an error, return a standard error response
+    return res.status(500).json({
       success: false,
       message: 'Failed to create user',
-      error: error,
+      error: error?.message,
     })
   }
 }
+
 const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await userService.getUser()
@@ -44,24 +73,30 @@ const getUsers = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: formattedUsers,
     })
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch users',
-      error: error,
+      error: error?.message,
     })
   }
 }
-const getSingleUser = async (req: Request, res: Response): Promise<void> => {
+export const getSingleUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const userId = req.params.userId
-
+    const userId: string = req.params.userId
     const user = await userService.singleUser(userId)
 
     if (!user) {
       res.status(404).json({
         success: false,
         message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       })
       return
     }
@@ -69,60 +104,90 @@ const getSingleUser = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       success: true,
       message: 'User fetched successfully!',
-      data: user,
+      data: {
+        userId: user?.userId,
+        username: user?.username,
+        fullName: user?.fullName,
+        age: user?.age,
+        email: user?.email,
+        isActive: user?.isActive,
+        hobbies: user?.hobbies,
+        address: user?.address,
+      },
     })
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user',
-      error: error, // Change 'error' to 'error.message' to capture the error message
+      error: {
+        code: 500,
+        description: error.message || 'Internal Server Error',
+      },
     })
   }
 }
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string = req.params.userId
     const userDataToUpdate = req.body
 
-    // Check if the user exists and update the data
-    // console.log({ userId }, { userDataToUpdate })
-    const updatedUser = await userService.updateUser(userId, userDataToUpdate)
-    if (!updatedUser) {
+    const { success, data } = await userService.updateUser(
+      userId,
+      userDataToUpdate,
+    )
+
+    if (!success) {
       res.status(404).json({
         success: false,
         message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       })
       return
     }
-    // console.log({ updateUser })
+
     res.status(200).json({
       success: true,
-      message: 'User updated successfully!!!!!!!!',
-      data: updateUser,
+      message: 'User updated successfully!',
+      data: {
+        userId: data?.userId,
+        username: data?.username,
+        fullName: data?.fullName,
+        age: data?.age,
+        email: data?.email,
+        isActive: data?.isActive,
+        hobbies: data?.hobbies,
+        address: data?.address,
+      },
     })
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to update user',
-      error: error,
+      error: {
+        code: 500,
+        description: error?.message || 'Internal Server Error',
+      },
     })
   }
 }
 
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.params.userId
+    const userId: string = req.params.userId
 
-    // Find the user by ID and delete
-    // console.log({ userId })
     const deletedUser = await userService.deleteUser(userId)
 
-    // Check if the user was found and deleted
     if (!deletedUser) {
       res.status(404).json({
         success: false,
         message: 'User not found',
-        data: null,
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       })
       return
     }
@@ -132,15 +197,17 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
       message: 'User deleted successfully!',
       data: null,
     })
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
       message: 'Failed to delete user',
-      error: error,
+      error: {
+        code: 500,
+        description: error?.message || 'Internal Server Error',
+      },
     })
   }
 }
-
 export const userController = {
   getUsers,
   createUser,

@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const creatUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
-    // console.log({ userData })
     const result = yield user_model_1.default.create(userData);
     return result;
 });
+// const creatUser = async (userData: User) => await UserModel.create(userData)
 const getUser = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_model_1.default.find();
     return result;
@@ -39,19 +39,24 @@ const singleUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const updateUser = (userId, updatedValue) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, updatedValue, {
+        const updatedUser = yield user_model_1.default.findOneAndUpdate({ userId: userId }, // Assuming the field to search for is userId
+        updatedValue, {
             new: true,
             runValidators: true,
         });
         if (!updatedUser) {
-            return { success: false, message: 'User not found or no changes applied' };
+            return {
+                success: false,
+                message: 'User not found or no changes applied',
+            };
         }
-        return updatedUser;
+        return {
+            success: true,
+            message: 'User updated successfully!',
+            data: updatedUser,
+        };
     }
     catch (error) {
-        // Handle specific errors or log them for debugging
-        console.error('Error updating user:', error);
-        // Return appropriate error message
         return {
             success: false,
             message: 'Failed to update user. Please try again later.',
@@ -61,8 +66,8 @@ const updateUser = (userId, updatedValue) => __awaiter(void 0, void 0, void 0, f
 const deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     // const validUserId = new mongoose.Types.ObjectId(userId) // Use mongoose.Types.ObjectId
     // console.log({ validUserId })
-    const deletedUser = yield user_model_1.default.findOneAndDelete({ userId });
-    return deletedUser ? deletedUser : null; // Return the deleted user or null if not found
+    yield user_model_1.default.findOneAndDelete({ userId });
+    return null; // Return the deleted user or null if not found
 });
 exports.userService = {
     creatUser,

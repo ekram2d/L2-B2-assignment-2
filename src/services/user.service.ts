@@ -2,10 +2,12 @@ import { User } from '../interfaces/user.interface'
 import UserModel from '../models/user.model'
 
 const creatUser = async (userData: User): Promise<User> => {
-  // console.log({ userData })
   const result = await UserModel.create(userData)
+
   return result
 }
+
+// const creatUser = async (userData: User) => await UserModel.create(userData)
 
 const getUser = async (): Promise<User[]> => {
   const result = await UserModel.find()
@@ -25,14 +27,13 @@ const singleUser = async (userId: string): Promise<User | null> => {
     return null
   }
 }
-
 const updateUser = async (
   userId: string,
-  updatedValue: User,
-): Promise<User | { success: boolean; message: string }> => {
+  updatedValue: Partial<User>,
+): Promise<{ success: boolean; message: string; data?: User }> => {
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      userId,
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { userId: userId }, // Assuming the field to search for is userId
       updatedValue,
       {
         new: true,
@@ -41,15 +42,18 @@ const updateUser = async (
     )
 
     if (!updatedUser) {
-      return { success: false, message: 'User not found or no changes applied' }
+      return {
+        success: false,
+        message: 'User not found or no changes applied',
+      }
     }
 
-    return updatedUser
+    return {
+      success: true,
+      message: 'User updated successfully!',
+      data: updatedUser,
+    }
   } catch (error) {
-    // Handle specific errors or log them for debugging
-    // console.error('Error updating user:', error)
-
-    // Return appropriate error message
     return {
       success: false,
       message: 'Failed to update user. Please try again later.',
@@ -58,13 +62,13 @@ const updateUser = async (
 }
 
 const deleteUser = async (userId: string): Promise<User | null> => {
-  // const validUserId = new mongoose.Types.ObjectId(userId) // Use mongoose.Types.ObjectId
-  // console.log({ validUserId })
-  const deletedUser = await UserModel.findOneAndDelete({ userId })
-
-  return deletedUser ? deletedUser : null // Return the deleted user or null if not found
+  try {
+    const deletedUser = await UserModel.findOneAndDelete({ userId }).lean()
+    return deletedUser as User | null
+  } catch (error) {
+    throw new Error('Failed to delete user') // Handle any errors while deleting the user
+  }
 }
-
 export const userService = {
   creatUser,
   getUser,

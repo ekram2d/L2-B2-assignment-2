@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderService = void 0;
 const user_model_1 = __importDefault(require("../models/user.model")); // Assuming UserDocument is the user model document type
 const addOrder = (userId, orderData) => __awaiter(void 0, void 0, void 0, function* () {
-    const updatedUser = yield user_model_1.default.findById({ userId: userId });
-    console.log(updatedUser);
+    const updatedUser = yield user_model_1.default.findOne({ userId: userId });
+    // console.log(updatedUser)
     if (!updatedUser) {
         throw new Error('User not found');
     }
@@ -24,9 +24,27 @@ const addOrder = (userId, orderData) => __awaiter(void 0, void 0, void 0, functi
         updatedUser.orders = [];
     }
     updatedUser.orders.push(orderData);
-    const savedUser = yield updatedUser.save();
-    return savedUser;
+    yield updatedUser.save();
+    return null;
+});
+const getOrder = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const gettedUser = yield user_model_1.default.findOne({ userId: userId });
+    if (!gettedUser) {
+        throw new Error('User not found');
+    }
+    const order = gettedUser === null || gettedUser === void 0 ? void 0 : gettedUser.orders;
+    return order || null;
+});
+const getOrderTotal = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const gettedUser = yield user_model_1.default.findOne({ userId: userId });
+    // console.log(gettedUser?.orders)
+    if (!gettedUser) {
+        throw new Error('User not found');
+    }
+    return gettedUser;
 });
 exports.orderService = {
     addOrder,
+    getOrder,
+    getOrderTotal,
 };

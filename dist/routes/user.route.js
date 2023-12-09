@@ -14,4 +14,6 @@ exports.router.get('/users/:userId', user_controller_1.userController.getSingleU
 exports.router.patch('/users/:userId', user_controller_1.userController.updateUser);
 exports.router.delete('/users/:userId', user_controller_1.userController.deleteUser);
 exports.router.post('/users/:userId/orders', order_controller_1.orderController.addToOrder);
+exports.router.get('/users/:userId/orders', order_controller_1.orderController.getSinleUserOrders);
+exports.router.get('/users/:userId/orders/total-price', order_controller_1.orderController.getSinleUserOrdersSum);
 exports.userRoutes = exports.router;

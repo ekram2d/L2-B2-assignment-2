@@ -17,20 +17,21 @@ const addOrder = async (
   }
 
   updatedUser.orders.push(orderData)
-  const savedUser = await updatedUser.save()
+  await updatedUser.save()
 
-  return savedUser
+  return null
 }
-const getOrder = async (userId: string): Promise<Order | null> => {
+const getOrder = async (userId: string): Promise<Order[] | null> => {
   const gettedUser = await UserModel.findOne({ userId: userId })
-  // console.log(gettedUser?.orders)
 
   if (!gettedUser) {
     throw new Error('User not found')
   }
 
-  return gettedUser?.orders
+  const order = gettedUser?.orders
+  return order || null
 }
+
 const getOrderTotal = async (userId: string): Promise<User | null> => {
   const gettedUser = await UserModel.findOne({ userId: userId })
   // console.log(gettedUser?.orders)

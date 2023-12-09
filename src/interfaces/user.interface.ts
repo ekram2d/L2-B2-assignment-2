@@ -3,24 +3,24 @@ export interface Order {
   price: number
   quantity: number
 }
-interface Fullname {
-  firstName: string
-  lastName: string
-}
-interface Address {
-  street: string
-  city: string
-  country: string
-}
+
+// Define the User interface
 export interface User {
   userId: number
   username: string
   password: string
-  fullName: Fullname
+  fullName: {
+    firstName: string
+    lastName: string
+  }
   age: number
   email: string
   isActive: boolean
   hobbies: string[]
-  address: Address
+  address: {
+    street: string
+    city: string
+    country: string
+  }
   orders: Order[]
 }

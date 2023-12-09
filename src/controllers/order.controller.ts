@@ -1,18 +1,12 @@
 import { Request, Response } from 'express'
 import { Order } from '../interfaces/user.interface'
 import { orderService } from '../services/order.service'
+import { userService } from '../services/user.service'
 
 const addToOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.userId
     const { productName, price, quantity } = req.body
-
-    // Check if the user exists
-    // const userExists = await UserModel.findById(userId)
-    // if (!userExists) {
-    //   res.status(404).json({ success: false, message: 'User not found' })
-    //   return
-    // }
 
     const orderData: Order = {
       productName,
@@ -43,18 +37,27 @@ const getSinleUserOrders = async (
   try {
     const userId = req.params.userId
 
-    // Check if the user exists
-    const Orders = await orderService.getOrder(userId)
-    if (!Orders) {
+    // Fetch orders for the specified user from the database
+    const getsingle = await userService.singleUser(userId)
+
+    if (!getsingle) {
       res.status(404).json({
         success: false,
         message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       })
       return
     }
-
-    // User found, retrieve orders
-    const userOrders = Orders
+    const orders = await orderService.getOrder(userId)
+    // Extract only the necessary fields from orders
+    const userOrders = orders?.map((order: Order) => ({
+      productName: order.productName,
+      price: order.price,
+      quantity: order.quantity,
+    }))
 
     res.status(200).json({
       success: true,
@@ -71,6 +74,7 @@ const getSinleUserOrders = async (
     })
   }
 }
+
 const getSinleUserOrdersSum = async (
   req: Request,
   res: Response,
@@ -79,19 +83,25 @@ const getSinleUserOrdersSum = async (
     const userId = req.params.userId
 
     // Check if the user exists
-    const Orders = await orderService.getOrderTotal(userId)
-    if (!Orders) {
+
+    const getsingle = await userService.singleUser(userId)
+
+    if (!getsingle) {
       res.status(404).json({
         success: false,
         message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
       })
       return
     }
-
+    const Orders = await orderService.getOrderTotal(userId)
     // User found, retrieve orders
     const userOrders = Orders?.orders
     // const userOrders = user.orders;
-    const totalPrice = userOrders.reduce(
+    const totalPrice = userOrders?.reduce(
       (acc: number, order: Order) => acc + order.price * order.quantity,
       0,
     )
@@ -100,7 +110,7 @@ const getSinleUserOrdersSum = async (
       success: true,
       message: 'Total price calculated successfully!',
       data: {
-        totalPrice: totalPrice.toFixed(2), // Convert to fixed decimal places if needed
+        totalPrice: totalPrice?.toFixed(2), // Convert to fixed decimal places if needed
       },
     })
   } catch (error) {
