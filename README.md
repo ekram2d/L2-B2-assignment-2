@@ -8,6 +8,11 @@ This is Assignment 2's README file.
 
    ```bash
    git clone https://github.com/ekram2d/L2-B2-assignment-2.git
+   cd L2-B2-assignment-2
+   npm install
+   npm run dev
+   
+
 2.cd L2-B2-assignment-2
 3.npm install
 4.npm run dev
